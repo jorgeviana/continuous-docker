@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+echo
+echo
+echo "--- --- ---"
+echo
+echo
+
+CONTAINER_ID="continuous-docker"
+IMAGE="continuous-docker-image:0.1"
+
+# removing image every time otherwise a new image gets created every time Dockerfile changes...
+docker image rm $IMAGE
+
+# allows to see output of each RUN command during the build, deprecated...
+DOCKER_BUILDKIT=0 docker build --tag $IMAGE .
+
+echo
+docker run --name $CONTAINER_ID --rm $IMAGE
+EXIT_CODE=$?
+
+IMAGE_COUNT=$(docker images | tail -n +2 | wc -l | xargs)
+
+echo
+echo "Exit code: $EXIT_CODE"
+echo "Image count in the system (sanity check): $IMAGE_COUNT"
